@@ -43,38 +43,51 @@ var upload = multer({
 
 router.post("/add", upload, async (req, res) => {
     try {
-      const user = new User({
-        name: req.body.name,
-        email: req.body.Email,
-        phone: req.body.phone,
-        image: req.file.filename,
-      });
-  
-      await user.save();
-  
-      req.session.message = {
-        type: "success",
-        message: "User added successfully!",
-      };
-      res.redirect("/");
+        const user = new User({
+            name: req.body.name,
+            email: req.body.Email,
+            phone: req.body.phone,
+            image: req.file.filename,
+        });
+
+        await user.save();
+
+        req.session.message = {
+            type: "success",
+            message: "User added successfully!",
+        };
+        res.redirect("/");
     } catch (err) {
-      res.json({ message: err.message, type: "danger" });
+        res.json({ message: err.message, type: "danger" });
     }
-  });
-  
+});
 
 router.get('/', (req, res) => {
-    User.find().exec((err, users) => {
-        if(err){
-            res.json({ message: err.message})
-        }else{
+    User.find()
+        .then(users => {
             res.render('index', {
                 title: 'Home Page',
                 users: users,
             });
-        }
-    })
-})
+        })
+        .catch(err => {
+            res.status(500).json({ message: err.message });
+        });
+});
+
+// router.get('/', (req, res) => {
+//     User.find().exec((err, users) => {
+//         if(err){
+//             res.json({ message: err.message})
+//         }else{
+//             res.render('index', {
+//                 title: 'Home Page',
+//                 users: users,
+//             });
+//         }
+//     })
+// })
+router.get('/', (req, res) => { })
 
 router.get('/add', (req, res) => {
     res.render("add_users", { title: "add users" })
